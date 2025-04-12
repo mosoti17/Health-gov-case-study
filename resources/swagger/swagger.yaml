@@ -1,0 +1,873 @@
+openapi: 3.0.0
+info:
+  title: HealthGov API
+  description: API for the Health Government Application for insurance enrollment and management
+  version: 1.0.0
+  
+servers:
+  - url: http://localhost:3333
+    description: Development server
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        username:
+          type: string
+        email:
+          type: string
+          format: email
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    
+    PersonalInfo:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        user_id:
+          type: integer
+          format: int64
+        first_name:
+          type: string
+        last_name:
+          type: string
+        date_of_birth:
+          type: string
+          format: date
+        ssn:
+          type: string
+        gender:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    
+    ContactInfo:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        user_id:
+          type: integer
+          format: int64
+        address_line1:
+          type: string
+        address_line2:
+          type: string
+        city:
+          type: string
+        state:
+          type: string
+        zip_code:
+          type: string
+        phone_number:
+          type: string
+        secondary_phone:
+          type: string
+        email:
+          type: string
+          format: email
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    
+    Application:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        user_id:
+          type: integer
+          format: int64
+        insurance_plan_id:
+          type: integer
+          format: int64
+        status:
+          type: string
+          enum: [pending, approved, rejected, under_review]
+        submission_date:
+          type: string
+          format: date
+        decision_date:
+          type: string
+          format: date
+        decision_notes:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    
+    FinancialInfo:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        application_id:
+          type: integer
+          format: int64
+        annual_income:
+          type: number
+          format: float
+        household_size:
+          type: integer
+        tax_filing_status:
+          type: boolean
+        requesting_subsidy:
+          type: boolean
+        employer_coverage:
+          type: boolean
+        medicaid_eligible:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    
+    InsurancePlan:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        provider:
+          type: string
+        plan_level:
+          type: string
+          enum: [Bronze, Silver, Gold, Platinum]
+        base_premium:
+          type: number
+          format: float
+        deductible:
+          type: number
+          format: float
+        copay:
+          type: number
+          format: float
+        max_out_of_pocket:
+          type: number
+          format: float
+        federal_marketplace_id:
+          type: integer
+          format: int64
+        active:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    
+    CoverageDetails:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        insurance_plan_id:
+          type: integer
+          format: int64
+        prescription_coverage:
+          type: boolean
+        dental_coverage:
+          type: boolean
+        vision_coverage:
+          type: boolean
+        mental_health_coverage:
+          type: boolean
+        preventative_care_coverage:
+          type: boolean
+        specialist_coverage:
+          type: boolean
+        emergency_coverage:
+          type: boolean
+        hospitalization_coverage:
+          type: boolean
+        additional_coverage:
+          type: object
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    
+    FederalMarketplace:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        platform_id:
+          type: integer
+          format: int64
+        open_enrollment:
+          type: boolean
+        enrollment_start_date:
+          type: string
+          format: date
+        enrollment_end_date:
+          type: string
+          format: date
+        government_agency_id:
+          type: integer
+          format: int64
+        data_services_hub_id:
+          type: integer
+          format: int64
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    
+    Token:
+      type: object
+      properties:
+        type:
+          type: string
+        token:
+          type: string
+        refreshToken:
+          type: string
+    
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+        status:
+          type: integer
+    
+    EligibilityResult:
+      type: object
+      properties:
+        eligible:
+          type: boolean
+        reasons:
+          type: array
+          items:
+            type: string
+        score:
+          type: number
+          format: float
+    
+    PlanComparison:
+      type: object
+      properties:
+        priceDifference:
+          type: number
+          format: float
+        coverageDifference:
+          type: string
+        recommendation:
+          type: string
+    
+    PlanDetails:
+      type: object
+      properties:
+        planName:
+          type: string
+        provider:
+          type: string
+        coverage:
+          type: string
+        premium:
+          type: number
+          format: float
+        deductible:
+          type: number
+          format: float
+        copay:
+          type: number
+          format: float
+    
+    MarketplaceInfo:
+      type: object
+      properties:
+        platformId:
+          type: integer
+          format: int64
+        openEnrollment:
+          type: boolean
+        availablePlans:
+          type: integer
+          format: int64
+
+paths:
+  /register:
+    post:
+      summary: Register a new user
+      description: Create a new user account with personal and contact information
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  format: password
+                username:
+                  type: string
+                personalInfo:
+                  $ref: '#/components/schemas/PersonalInfo'
+                contactInfo:
+                  $ref: '#/components/schemas/ContactInfo'
+              required:
+                - email
+                - password
+                - username
+                - personalInfo
+                - contactInfo
+      responses:
+        '201':
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  
+  /login:
+    post:
+      summary: Authenticate user
+      description: Login with email and password to get an access token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  format: password
+              required:
+                - email
+                - password
+      responses:
+        '200':
+          description: Authentication successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Token'
+        '401':
+          description: Authentication failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  
+  /users/profile:
+    get:
+      summary: Get user profile
+      description: Retrieve the authenticated user's profile information
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: User profile retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    $ref: '#/components/schemas/User'
+                  personalInfo:
+                    $ref: '#/components/schemas/PersonalInfo'
+                  contactInfo:
+                    $ref: '#/components/schemas/ContactInfo'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    put:
+      summary: Update user profile
+      description: Update the authenticated user's profile information
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                username:
+                  type: string
+                personalInfo:
+                  $ref: '#/components/schemas/PersonalInfo'
+                contactInfo:
+                  $ref: '#/components/schemas/ContactInfo'
+      responses:
+        '200':
+          description: Profile updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  user:
+                    $ref: '#/components/schemas/User'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  
+  /applications:
+    post:
+      summary: Create application
+      description: Create a new insurance application
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  enum: [pending, approved, rejected, under_review]
+                financialInfo:
+                  $ref: '#/components/schemas/FinancialInfo'
+              required:
+                - financialInfo
+      responses:
+        '201':
+          description: Application created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Application'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    get:
+      summary: Get user applications
+      description: Retrieve all applications for the authenticated user
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Applications retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Application'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  
+  /applications/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+    get:
+      summary: Get application details
+      description: Retrieve detailed information about a specific application
+      responses:
+        '200':
+          description: Application retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    format: int64
+                  user:
+                    $ref: '#/components/schemas/User'
+                  financialInfo:
+                    $ref: '#/components/schemas/FinancialInfo'
+                  status:
+                    type: string
+                  submission_date:
+                    type: string
+                    format: date
+        '404':
+          description: Application not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    put:
+      summary: Update application
+      description: Update information for a specific application
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  enum: [pending, approved, rejected, under_review]
+                financialInfo:
+                  $ref: '#/components/schemas/FinancialInfo'
+      responses:
+        '200':
+          description: Application updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  application:
+                    $ref: '#/components/schemas/Application'
+        '404':
+          description: Application not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  
+  /applications/{id}/eligibility:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+    get:
+      summary: Check application eligibility
+      description: Check the eligibility status of an application
+      responses:
+        '200':
+          description: Eligibility checked successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EligibilityResult'
+        '404':
+          description: Application not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  
+  /insurance-plans:
+    get:
+      summary: List insurance plans
+      description: Retrieve a list of available insurance plans
+      parameters:
+        - name: provider
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: minPremium
+          in: query
+          required: false
+          schema:
+            type: number
+            format: float
+        - name: maxPremium
+          in: query
+          required: false
+          schema:
+            type: number
+            format: float
+      responses:
+        '200':
+          description: Plans retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/InsurancePlan'
+  
+  /insurance-plans/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+    get:
+      summary: Get insurance plan
+      description: Retrieve detailed information about a specific insurance plan
+      responses:
+        '200':
+          description: Plan retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InsurancePlan'
+        '404':
+          description: Plan not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  
+  /insurance-plans/{id}/details:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+    get:
+      summary: Get insurance plan details
+      description: Retrieve comprehensive details about a specific insurance plan
+      responses:
+        '200':
+          description: Plan details retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlanDetails'
+        '404':
+          description: Plan not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  
+  /insurance-plans/{id}/compare:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: compareToPlanId
+        in: query
+        required: true
+        schema:
+          type: integer
+          format: int64
+    get:
+      summary: Compare insurance plans
+      description: Compare two insurance plans side by side
+      responses:
+        '200':
+          description: Comparison completed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlanComparison'
+        '404':
+          description: One or both plans not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  
+  /insurance-plans/{id}/premium:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: age
+        in: query
+        required: false
+        schema:
+          type: integer
+      - name: zipCode
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: tobaccoUser
+        in: query
+        required: false
+        schema:
+          type: boolean
+    get:
+      summary: Calculate premium
+      description: Calculate the premium for a specific plan based on user details
+      responses:
+        '200':
+          description: Premium calculated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  premium:
+                    type: number
+                    format: float
+        '404':
+          description: Plan not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  
+  /marketplace:
+    get:
+      summary: Get marketplace information
+      description: Retrieve general information about the federal marketplace
+      responses:
+        '200':
+          description: Marketplace information retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MarketplaceInfo'
+  
+  /marketplace/browse:
+    get:
+      summary: Browse available insurance plans in marketplace
+      description: List all available insurance plans with optional filtering
+      parameters:
+        - name: provider
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: plan_level
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [Bronze, Silver, Gold, Platinum]
+        - name: max_premium
+          in: query
+          required: false
+          schema:
+            type: number
+            format: float
+      responses:
+        '200':
+          description: Plans retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/InsurancePlan'
+  
+  /marketplace/enroll:
+    post:
+      summary: Enroll in insurance plan
+      description: Enroll the authenticated user in a specific insurance plan
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                planId:
+                  type: integer
+                  format: int64
+              required:
+                - planId
+      responses:
+        '200':
+          description: Enrollment processed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  success:
+                    type: boolean
+        '400':
+          description: Enrollment failed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  success:
+                    type: boolean
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
