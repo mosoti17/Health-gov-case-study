@@ -5,6 +5,8 @@
   "description": "Adonisjs boilerplate for API server with pre-configured JWT",
   "main": "index.js",
   "scripts": {
+    "migrate": "node ace migration:run",
+    "seed": "node ace seed",
     "start": "node server.js",
     "test": "node ace test"
   },
@@ -36,6 +38,7 @@
     "App": "./app"
   },
   "devDependencies": {
+    "@flydotio/dockerfile": "^0.7.10",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1"
   }
