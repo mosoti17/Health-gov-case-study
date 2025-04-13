@@ -1,11 +1,13 @@
 'use strict'
 
+/** @type {typeof import('@adonisjs/framework/src/Route/Manager')} */
 const Route = use('Route')
 
-Route.get('/docs', ({ view }) => {
-  return view.render('swagger')
+Route.get('docs', ({view}) => {
+  return view.render('docs.redoc');
 })
-Route.get('/swagger', 'SwaggerController.index')
+Route.get('/swagger.yaml', 'SwaggerController.index')
+
 
 // Auth routes
 Route.post('register', 'UserController.register')
