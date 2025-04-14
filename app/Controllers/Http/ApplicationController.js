@@ -6,10 +6,15 @@ const FinancialInfo = use('App/Models/FinancialInfo')
 class ApplicationController {
   async create({ auth, request, response }) {
     const user = await auth.getUser()
-    const applicationData = request.only(['status'])
+    const applicationData = request.only(['status', 'insurance_plan_id'])
     const financialInfoData = request.input('financialInfo')
     
-    const application = await user.submitApplication(applicationData)
+    const application = await Application.create({
+      user_id: user.id,
+      insurance_plan_id: applicationData.insurance_plan_id,
+      status: applicationData.status,
+      submission_date: new Date()
+    })
     
     await FinancialInfo.create({
       ...financialInfoData,

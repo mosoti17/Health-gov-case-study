@@ -31,6 +31,12 @@ class User extends Model {
   }
 
   async submitApplication(applicationData) {
+    await Application.create({
+      user_id: this.id,
+      insurance_plan_id: applicationData.insurance_plan_id,
+      status: applicationData.status,
+      submission_date: new Date(now)
+    })
     const application = new Application()
     application.fill(applicationData)
     application.user_id = this.id

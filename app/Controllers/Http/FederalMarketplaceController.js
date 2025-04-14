@@ -17,7 +17,9 @@ class FederalMarketplaceController {
     const marketplace = await FederalMarketplace.first()
     const filters = request.get()
     
-    const plans = await marketplace.browseInsurancePlans(filters)
+    const plans = await marketplace.insurancePlans()
+    .where(filters)
+    .fetch()
     return response.json(plans)
   }
 

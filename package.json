@@ -8,6 +8,7 @@
     "migrate": "node ace migration:run",
     "seed": "node ace seed",
     "start": "node server.js",
+    "deploy": "node ace migration:run --force  && node server.js",
     "test": "node ace test"
   },
   "keywords": [
@@ -32,14 +33,14 @@
     "@adonisjs/validator": "^5.1.0",
     "adonis-swagger": "^1.2.9",
     "js-yaml": "^4.1.0",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1",
     "pg": "^8.14.1"
   },
   "autoload": {
     "App": "./app"
   },
   "devDependencies": {
-    "@flydotio/dockerfile": "^0.7.10",
-    "swagger-jsdoc": "^6.2.8",
-    "swagger-ui-express": "^5.0.1"
+    "@flydotio/dockerfile": "^0.7.10"
   }
 }

@@ -17,7 +17,7 @@ class FederalMarketplace extends Model {
 
   async browseInsurancePlans(filters = {}) {
     // Logic to filter and return insurance plans
-    const plans = await InsurancePlan.query()
+    const plans = aw.query()
       .where(filters)
       .fetch()
     return plans

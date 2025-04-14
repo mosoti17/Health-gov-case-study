@@ -22,7 +22,7 @@ RUN apt-get update -qq && \
 
 # Install node modules
 COPY package-lock.json package.json ./
-RUN npm ci
+RUN npm install 
 
 # Copy application code
 COPY . .
@@ -36,11 +36,4 @@ COPY --from=build /app /app
 
 # Start the server by default, this can be overwritten at runtime
 EXPOSE 3000
-ENV CACHE_VIEWS="true" \
-    DB_CONNECTION="pg" \
-    DRIVE_DISK="local" \
-    HOST="0.0.0.0" \
-    PORT="3000" \
-    SESSION_DRIVER="cookie"
-CMD [ "npm", "run", "migrate" ]
-CMD [ "npm", "run", "start" ]
+CMD [ "npm", "run", "deploy" ]
